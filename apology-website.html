@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>آسف — موقع اعتذار من القلب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF7EE;
+    --bg2:#FFEFE3;
+    --surface:#FFFFFF;
+    --surface2:#FFF1E6;
+    --ink:#2B1810;
+    --ink2:#6B4A3A;
+    --muted:#9A7A6A;
+    --accent:#E4572E;
+    --accent2:#C73E1D;
+    --accent-soft:#FFE0D1;
+    --gold:#E9A23B;
+    --rose:#E85D75;
+    --line:#F0D9C8;
+    --shadow:0 20px 50px rgba(180,80,40,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1A110D;
+      --bg2:#241611;
+      --surface:#2A1B14;
+      --surface2:#332016;
+      --ink:#FFF3E8;
+      --ink2:#E8C9B5;
+      --muted:#B08E7A;
+      --accent:#FF7A4D;
+      --accent2:#FF9A76;
+      --accent-soft:#3D2418;
+      --line:#3D2A1E;
+      --shadow:0 20px 50px rgba(0,0,0,.45);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Cairo",system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;line-height:1.7}
+  button{min-height:44px}
+  a{min-height:36px;display:inline-flex;align-items:center}
+
+  /* floating background words */
+  #bgCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bg-word{position:absolute;font-weight:900;color:var(--accent);opacity:.05;white-space:nowrap;animation:floatUp linear infinite;user-select:none}
+  @keyframes floatUp{from{transform:translateY(20px) rotate(-4deg)}to{transform:translateY(-30px) rotate(3deg)}}
+  @media (prefers-reduced-motion: reduce){.bg-word{animation:none}.marquee-track{animation:none!important}}
+
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 20px}
+
+  /* HERO */
+  .hero{min-height:92svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 20px 32px;position:relative}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 16px;border-radius:999px;font-size:14px;font-weight:700;color:var(--ink2);box-shadow:var(--shadow)}
+  .hero-badge i{width:8px;height:8px;background:var(--rose);border-radius:50%;display:inline-block;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
+  .hero-sorry{font-family:"Amiri",serif;font-size:clamp(110px,28vw,260px);line-height:.9;font-weight:700;color:var(--accent);margin:10px 0 0;letter-spacing:-.02em;text-shadow:0 10px 0 var(--accent-soft)}
+  .hero-sub{font-size:clamp(22px,4vw,36px);font-weight:800;line-height:1.4;max-width:640px;margin:18px auto 0}
+  .hero-sub span{color:var(--accent)}
+  .hero-desc{color:var(--ink2);font-size:17px;max-width:520px;margin:14px auto 0}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px}
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;padding:14px 26px;border-radius:999px;transition:.2s;text-decoration:none}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 24px rgba(228,87,46,.35)}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-2px)}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .hero-stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:36px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 20px;min-width:130px;box-shadow:var(--shadow)}
+  .stat b{font-size:26px;display:block;line-height:1;color:var(--accent)}
+  .stat span{font-size:13px;color:var(--muted);font-weight:700}
+  .scroll-hint{margin-top:36px;color:var(--muted);font-size:13px;font-weight:700;animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* MARQUEE */
+  .marquee{background:var(--accent);color:#fff;overflow:hidden;padding:14px 0;transform:rotate(-1.2deg) scale(1.02);box-shadow:0 10px 30px rgba(228,87,46,.3);position:relative;z-index:2}
+  .marquee-track{display:flex;gap:0;width:max-content;animation:scroll 22s linear infinite;font-weight:900;font-size:20px;white-space:nowrap}
+  @keyframes scroll{to{transform:translateX(50%)}}
+  [dir="rtl"] .marquee-track{animation-name:scrollR}
+  @keyframes scrollR{to{transform:translateX(-50%)}}
+
+  section{padding:72px 0}
+  .kicker{font-size:13px;letter-spacing:.08em;font-weight:900;color:var(--accent);text-transform:uppercase}
+  h2{font-size:clamp(28px,5vw,44px);line-height:1.25;margin:8px 0 12px;font-weight:900}
+  .lead{color:var(--ink2);font-size:17px;max-width:620px}
+  .center{text-align:center}.center .lead{margin-inline:auto}
+
+  /* COUNTER PLAYGROUND */
+  .play-card{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow);text-align:center;position:relative;overflow:hidden}
+  .big-counter{font-size:clamp(56px,10vw,96px);font-weight:900;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+  .counter-label{font-weight:800;color:var(--ink2)}
+  .rain-stage{height:180px;position:relative;overflow:hidden;background:var(--surface2);border-radius:18px;margin:20px 0;border:1px dashed var(--line)}
+  .rain-word{position:absolute;font-weight:900;color:var(--accent);animation:fall linear forwards;pointer-events:none}
+  @keyframes fall{to{transform:translateY(220px) rotate(14deg);opacity:0}}
+  .play-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+  /* WALL */
+  .wall{background:var(--ink);border-radius:28px;padding:28px 20px 20px;overflow:hidden;position:relative}
+  @media (prefers-color-scheme: dark){.wall{background:#0F0906;border:1px solid var(--line)}}
+  .wall-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px;color:#FFF3E8}
+  .wall-head h3{margin:0;font-size:24px}
+  .wall-head p{margin:4px 0 0;color:#C9A68F;font-size:14px}
+  .wall-count{background:#fff;color:#2B1810;font-weight:900;padding:8px 14px;border-radius:999px;font-size:14px;white-space:nowrap}
+  #wallGrid{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;justify-content:center;max-height:420px;overflow:hidden;position:relative}
+  #wallGrid::after{content:"";position:absolute;inset:auto 0 0 0;height:90px;background:linear-gradient(transparent, var(--ink))}
+  @media (prefers-color-scheme: dark){#wallGrid::after{background:linear-gradient(transparent,#0F0906)}}
+  .w{color:#FFE9D6;font-weight:800;line-height:1;cursor:default;transition:.15s}
+  .w:hover{color:var(--gold);transform:scale(1.25)}
+  .wall-more{width:100%;margin-top:16px;background:transparent;color:#FFE9D6;border:1.5px solid #5A3A2A}
+
+  /* LANGUAGES */
+  .lang-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}
+  @media(min-width:700px){.lang-grid{grid-template-columns:repeat(4,1fr)}}
+  .lang{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;text-align:center}
+  .lang b{font-size:22px;display:block}
+  .lang span{font-size:13px;color:var(--muted);font-weight:700}
+
+  /* LETTER */
+  .letter{background:var(--surface);border:1px solid var(--line);border-radius:8px 28px 28px 28px;padding:32px 28px;box-shadow:var(--shadow);position:relative;max-width:760px;margin:28px auto 0}
+  .letter::before{content:"✉️";position:absolute;top:-18px;inset-inline-start:24px;background:var(--accent);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;box-shadow:0 8px 16px rgba(228,87,46,.35)}
+  .letter p{font-family:"Amiri",serif;font-size:20px;line-height:2;color:var(--ink);margin:0 0 14px}
+  .letter .sign{font-family:"Amiri",serif;font-size:22px;color:var(--accent);font-weight:700}
+  .promises{display:grid;gap:12px;margin-top:24px}
+  @media(min-width:700px){.promises{grid-template-columns:1fr 1fr 1fr}}
+  .promise{background:var(--surface2);border-radius:18px;padding:18px;border:1px solid var(--line)}
+  .promise .ico{font-size:26px}
+  .promise h4{margin:8px 0 4px;font-size:16px}
+  .promise p{margin:0;font-size:14px;color:var(--ink2);font-family:inherit;line-height:1.7}
+
+  /* FORGIVE */
+  .forgive{background:linear-gradient(180deg,var(--bg2),var(--bg));border:1px solid var(--line);border-radius:28px;padding:36px 24px;text-align:center;overflow:hidden;position:relative}
+  .forgive h2{margin-top:0}
+  .meter{height:16px;background:var(--surface);border:1px solid var(--line);border-radius:999px;overflow:hidden;max-width:520px;margin:20px auto}
+  .meter-fill{height:100%;width:12%;background:linear-gradient(90deg,var(--gold),var(--accent));border-radius:999px;transition:width .5s cubic-bezier(.2,.9,.3,1.2)}
+  .forgive-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px;position:relative;min-height:60px}
+  #yesBtn{background:var(--accent);color:#fff}
+  #noBtn{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);position:relative;transition:.25s}
+  #forgiveMsg{font-weight:800;font-size:18px;min-height:32px;margin-top:16px;color:var(--accent)}
+  .hearts{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .heart{position:absolute;animation:rise 2.2s ease-out forwards;font-size:22px}
+  @keyframes rise{to{transform:translateY(-180px) scale(1.4) rotate(20deg);opacity:0}}
+
+  /* GENERATOR */
+  .gen-card{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow)}
+  .gen-output{background:var(--surface2);border:1.5px dashed var(--accent);border-radius:18px;padding:22px;font-family:"Amiri",serif;font-size:21px;line-height:1.9;min-height:110px;display:flex;align-items:center;justify-content:center;text-align:center}
+  .gen-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:800;font-size:14px;z-index:50;transition:.3s;box-shadow:var(--shadow);white-space:nowrap}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  footer{padding:36px 20px 48px;text-align:center;color:var(--muted);font-size:14px}
+  footer b{color:var(--accent);font-size:18px}
+  .fly{position:fixed;z-index:60;pointer-events:none;font-weight:900;color:var(--accent);animation:flyUp 1.1s ease-out forwards;text-shadow:0 2px 10px rgba(255,255,255,.6)}
+  @keyframes flyUp{to{transform:translateY(-110px) scale(1.3);opacity:0}}
+</style>
+</head>
+<body>
+<div id="bgCanvas" aria-hidden="true"></div>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="hero-badge"><i></i> رسالة اعتذار رسمية • عاجلة • من القلب</div>
+  <div class="hero-sorry" aria-label="آسف">آسِف</div>
+  <h1 class="hero-sub">آسف.. آسف.. وآسف <span>ألف مرة</span><br>ولو الألف مش كفاية، كمّل قراية 👇</h1>
+  <p class="hero-desc">الموقع ده كله اتعمل عشان كلمة واحدة تتقال بكل الطرق الممكنة: أنا غلطت، وحقك عليّا، ومش هتتكرر. كل سطر تحت هو «آسف» بشكل جديد.</p>
+  <div class="hero-actions">
+    <a href="#wall" class="btn btn-primary">شوف جدار الآسف ↓</a>
+    <a href="#forgive" class="btn btn-ghost">روّح لفقرة المسامحة 🤍</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><b id="statTotal">1,000+</b><span>كلمة آسف في الصفحة</span></div>
+    <div class="stat"><b>100%</b><span>ندم حقيقي</span></div>
+    <div class="stat"><b>0%</b><span>أعذار ومبررات</span></div>
+  </div>
+  <div class="scroll-hint">انزل تحت.. لسه في آسف كتير ↓</div>
+</header>
+
+<div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<main class="wrap">
+
+  <!-- INTERACTIVE COUNTER -->
+  <section id="play">
+    <div class="center">
+      <div class="kicker">جرّب بنفسك</div>
+      <h2>كل دوسة = آسف جديدة ❤️</h2>
+      <p class="lead">لو لسه شايف إن الآسف اللي فوق مش كفاية، دوس على الزرار وخلّي الآسف ينزل زي المطر. دوس قد ما تحب — أنا مش هتعب.</p>
+    </div>
+    <div class="play-card" style="margin-top:28px">
+      <div class="big-counter" id="counter">0</div>
+      <div class="counter-label" id="counterLabel">آسف اتقالت لحد دلوقتي بسببك</div>
+      <div class="rain-stage" id="rainStage"><div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:700;font-size:14px" id="rainHint">المسرح فاضي.. دوس «قُل آسف» وابدأ المطر 🌧️</div></div>
+      <div class="play-actions">
+        <button class="btn btn-primary" id="rainBtn">قُل آسف +1 🙏</button>
+        <button class="btn btn-ghost" id="rain10Btn">عاصفة آسف ×10 🌪️</button>
+        <button class="btn btn-ghost" id="burstBtn">انفجار آسف 💥</button>
+      </div>
+      <p id="milestone" style="font-weight:800;color:var(--accent);min-height:28px;margin:14px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- WALL -->
+  <section id="wall">
+    <div class="center">
+      <div class="kicker">القسم الأهم</div>
+      <h2>جدار الآسف العظيم 🧱</h2>
+      <p class="lead">مش آسف واحدة وخلاص.. ده جدار كامل مبني من كلمة آسف. مرّر الماوس أو صباعك عليهم، كل واحدة فيهم مقصودة.</p>
+    </div>
+    <div class="wall" style="margin-top:28px">
+      <div class="wall-head">
+        <div><h3>آسف × <span id="wallShown">1,000</span></h3><p>وكل ما تدوس «زوّد»، الجدار بيكبر.. زي الندم بالظبط</p></div>
+        <div class="wall-count">المجموع: <span id="wallTotal">1,000</span> آسف</div>
+      </div>
+      <div id="wallGrid" aria-label="جدار مليء بكلمة آسف"></div>
+      <button class="btn wall-more" id="wallMoreBtn">زوّد 100 آسف كمان +</button>
+    </div>
+  </section>
+
+  <!-- LANGUAGES -->
+  <section>
+    <div class="center">
+      <div class="kicker">عشان توصل بأي لغة</div>
+      <h2>آسف بكل لغات العالم 🌍</h2>
+      <p class="lead">لو «آسف» بالعربي مش واصلة، أهي بنفس المعنى وبنفس الإحساس بثماني لغات تانية:</p>
+    </div>
+    <div class="lang-grid">
+      <div class="lang"><b>آسف</b><span>العربية — الأصل 🤍</span></div>
+      <div class="lang"><b>I'm Sorry</b><span>English</span></div>
+      <div class="lang"><b>Je suis désolé</b><span>Français</span></div>
+      <div class="lang"><b>Lo siento</b><span>Español</span></div>
+      <div class="lang"><b>Es tut mir leid</b><span>Deutsch</span></div>
+      <div class="lang"><b>Mi dispiace</b><span>Italiano</span></div>
+      <div class="lang"><b>ごめんなさい</b><span>日本語</span></div>
+      <div class="lang"><b>Üzgünüm</b><span>Türkçe</span></div>
+    </div>
+  </section>
+
+  <!-- LETTER -->
+  <section>
+    <div class="center">
+      <div class="kicker">الرسالة الجدية</div>
+      <h2>وبعد كل الهزار ده.. كلمتين من القلب 💌</h2>
+    </div>
+    <article class="letter">
+      <p>أنا آسف. آسف بجد، مش آسف عشان أخلّص الموقف، ولا آسف عشان الكلام يعدّي. آسف لأن زعلك عندي مش حاجة بسيطة، ولأن آخر حاجة كنت عايزها إني أكون سبب في ضيقك.</p>
+      <p>حقك عليّا في اللي حصل، ولو الزمن رجع بيا كنت هعمل كل حاجة بشكل مختلف. أنا اتعلمت الدرس، ووعد مني إن الغلطة دي مش هتتكرر — مش كلام وبس، هتشوفه في تصرفاتي.</p>
+      <p>إنت غالي عندي أكتر ما الكلام يقدر يوصف، والصفحة دي كلها — بكل آسف فيها — ما تجيش نقطة في بحر اللي حاسس بيه. سامحني؟</p>
+      <p class="sign">— آسف، ونادم، ومستني تسامحني 🤍</p>
+    </article>
+
+    <div class="promises">
+      <div class="promise"><div class="ico">🎧</div><h4>هسمع أكتر</h4><p>هسمعك للآخر قبل ما أرد، وأفهم قصدك قبل ما أزعل.</p></div>
+      <div class="promise"><div class="ico">🛑</div><h4>مش هتتكرر</h4><p>الغلطة دي بالذات؟ اتعلمت منها، ومش هرجع لها تاني.</p></div>
+      <div class="promise"><div class="ico">☕</div><h4>تعويض رسمي</h4><p>مشروبك المفضل عليّا، في المكان اللي تحبه، وقت ما تحب.</p></div>
+    </div>
+  </section>
+
+  <!-- GENERATOR -->
+  <section>
+    <div class="center">
+      <div class="kicker">لسه عايز آسف تانية؟</div>
+      <h2>مولّد الآسف اللانهائي ♾️</h2>
+      <p class="lead">كل دوسة بتطلّع جملة اعتذار جديدة. انسخ اللي تعجبك وابعتها، أو دوس لحد ما تلاقي اللي توصف إحساسك.</p>
+    </div>
+    <div class="gen-card" style="margin-top:28px">
+      <div class="gen-output" id="genOutput">دوس «ولّد آسف جديدة» وشوف أول جملة هتطلعلك ✨</div>
+      <div class="gen-actions">
+        <button class="btn btn-primary" id="genBtn">ولّد آسف جديدة 🎲</button>
+        <button class="btn btn-ghost" id="copyBtn">انسخ الجملة 📋</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORGIVE -->
+  <section id="forgive">
+    <div class="forgive">
+      <div class="hearts" id="heartsBox"></div>
+      <div class="kicker">اللحظة الحاسمة</div>
+      <h2>ها.. سامحتني؟ 🥺</h2>
+      <p class="lead" style="margin-inline:auto">عدّاد المسامحة واقف عندك إنت. اختار بصراحة — بس خليك فاكر إن زرار «لسه زعلان» صعبان عليه يتداس.</p>
+      <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+      <div style="font-weight:800;color:var(--ink2);font-size:14px">مؤشر المسامحة: <span id="meterPct">12%</span></div>
+      <div class="forgive-btns">
+        <button class="btn" id="yesBtn">سامحتك خلاص 🤍</button>
+        <button class="btn" id="noBtn">لسه زعلان 😤</button>
+      </div>
+      <div id="forgiveMsg"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <b>آسف 🤍</b><br>
+  اتعملت الصفحة دي بكمية آسف تكفي بلد.. ولسه لو طلبت أكتر، هعمل أكتر.<br>
+  <span id="footerCount"></span>
+</footer>
+
+<div class="toast" id="toast">اتنسخت! ابعتها بسرعة قبل ما الزعل يرجع 📋</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---- background floating words ---- */
+  var bg = $("bgCanvas");
+  var words = ["آسف","سامحني","حقك عليّا","🤍","آسف"];
+  for(var i=0;i<16;i++){
+    var s=document.createElement("span");
+    s.className="bg-word";
+    s.textContent=words[i%words.length];
+    s.style.left=(Math.random()*68)+"%";
+    s.style.top=(Math.random()*92)+"%";
+    s.style.fontSize=(20+Math.random()*40)+"px";
+    s.style.animationDuration=(5+Math.random()*7)+"s";
+    s.style.animationDelay=(-Math.random()*6)+"s";
+    bg.appendChild(s);
+  }
+
+  /* ---- marquee ---- */
+  var chunk = "";
+  for(var m=0;m<10;m++) chunk += " آسف &nbsp;•&nbsp; سامحني &nbsp;•&nbsp; حقك عليّا &nbsp;•&nbsp; ";
+  $("marqueeTrack").innerHTML = "<span>"+chunk+"</span><span>"+chunk+"</span>";
+
+  /* ---- wall ---- */
+  var wallCount = 1000;
+  var grid = $("wallGrid");
+  function addWall(n){
+    var frag = document.createDocumentFragment();
+    for(var j=0;j<n;j++){
+      var w=document.createElement("span");
+      w.className="w";
+      w.textContent = (j%17===0) ? "سامحني" : "آسف";
+      w.style.fontSize = (13 + Math.random()*22) + "px";
+      w.style.opacity = (0.45 + Math.random()*0.55).toFixed(2);
+      frag.appendChild(w);
+    }
+    grid.appendChild(frag);
+  }
+  addWall(wallCount);
+  function syncWall(){
+    $("wallShown").textContent = wallCount.toLocaleString("ar-EG");
+    $("wallTotal").textContent = wallCount.toLocaleString("ar-EG");
+    $("footerCount").textContent = "عدد كلمة «آسف» في الصفحة دي لحد دلوقتي: " + (wallCount + rainCount).toLocaleString("ar-EG") + " ولسه بيزيد.";
+  }
+  $("wallMoreBtn").addEventListener("click", function(){
+    wallCount += 100; addWall(100); syncWall();
+    grid.scrollTop = grid.scrollHeight;
+    toast("اتزودت 100 آسف جديدة على الجدار 🧱");
+  });
+
+  /* ---- rain counter ---- */
+  var rainCount = 0;
+  var stage = $("rainStage");
+  var milestones = {10:"10 آسف! بداية حلوة.. كمّل 🥹",25:"25 آسف! الزعل بدأ يلين 🤍",50:"50 آسف! نص الطريق للمسامحة ✨",100:"100 آسف!! ده رقم قياسي 🏆",200:"200 آسف!!! خلاص بقى، سامح بقى 😭🤍"};
+  function dropSorry(n){
+    var hint = $("rainHint"); if(hint) hint.remove();
+    for(var k=0;k<n;k++){
+      (function(delay){
+        setTimeout(function(){
+          var el=document.createElement("span");
+          el.className="rain-word";
+          el.textContent = Math.random()<0.15 ? "🤍" : "آسف";
+          el.style.left = (Math.random()*88)+"%";
+          el.style.top = "-10px";
+          el.style.fontSize = (15+Math.random()*20)+"px";
+          el.style.animationDuration = (0.9+Math.random()*0.9)+"s";
+          stage.appendChild(el);
+          setTimeout(function(){ el.remove(); }, 2000);
+        }, delay);
+      })(k*70);
+    }
+    rainCount += n;
+    $("counter").textContent = rainCount.toLocaleString("ar-EG");
+    if(milestones[rainCount]) $("milestone").textContent = milestones[rainCount];
+    else if(n>1) $("milestone").textContent = "";
+    syncWall();
+  }
+  $("rainBtn").addEventListener("click", function(e){ dropSorry(1); fly(e); });
+  $("rain10Btn").addEventListener("click", function(){ dropSorry(10); });
+  $("burstBtn").addEventListener("click", function(){ dropSorry(30); $("milestone").textContent="انفجار آسف! 🌧️🤍🌧️"; });
+
+  function fly(e){
+    var el=document.createElement("span");
+    el.className="fly"; el.textContent="آسف 🤍";
+    el.style.left=(e.clientX-20)+"px"; el.style.top=(e.clientY-10)+"px"; el.style.fontSize="20px";
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 1150);
+  }
+
+  /* ---- generator ---- */
+  var lines = [
+    "آسف.. ولو كلمة آسف بتتصلّح، كنت صلّحت بيها الدنيا كلها. حقك عليّا 🤍",
+    "أنا آسف على الزعل، وعلى الوقت اللي ضاع وإحنا زعلانين. خلينا نرجّع الضحكة؟",
+    "آسف ألف مرة، ولو الألف خلصوا هبدأ أعدّ من الأول. سامحني؟ 🥺",
+    "غلطت، ومعترف، وآسف. تلات كلمات صغيرين بس معناهم كبير أوي عندي.",
+    "آسف لأنك أهم عندي من أي موقف، وأغلى من أي زعل. حقك عليّا بجد.",
+    "لو الآسف ليها صوت، كنت سمعت صوتي بيقولها من غير ما يسكُت من إمبارح.",
+    "آسف.. مش عشان أخلّص، عشان إنت تستاهل اعتذار يليق بيك 🤍",
+    "أنا آسف على كل لحظة حسّيت فيها إنك لوحدك في الزعل ده. أنا هنا، ومش همشي.",
+    "آسف وندمان ومستعد أصلّح. اديني فرصة أثبتلك إنها كانت غلطة ومش هتتكرر.",
+    "حقك عليّا في كل حاجة.. آسف، وسامحني، وخلينا نبدأ على نضافة 🤍"
+  ];
+  var li = -1;
+  $("genBtn").addEventListener("click", function(){
+    var next; do{ next = Math.floor(Math.random()*lines.length); }while(next===li);
+    li = next; $("genOutput").textContent = lines[li];
+  });
+  $("copyBtn").addEventListener("click", function(){
+    var txt = $("genOutput").textContent;
+    if(li<0){ toast("ولّد جملة الأول يا بطل 🎲"); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ toast("اتنسخت! ابعتها بسرعة 📋"); }, function(){ toast("النسخ ما نفعش — انسخها يدوي 🙏"); });
+    } else { toast("النسخ ما نفعش — انسخها يدوي 🙏"); }
+  });
+  var toastTimer;
+  function toast(msg){
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 2400);
+  }
+
+  /* ---- forgive game ---- */
+  var pct = 12, noClicks = 0, forgiven = false;
+  var noTexts = ["لسه زعلان 😤","متأكد؟ 🥺","طب فكّر تاني..","الزرار بيهرب منك على فكرة","خلاص هو تعب من الهرب 😅","دوس اللي جنبه وخلّصنا 🤍"];
+  function setMeter(){
+    $("meterFill").style.width = pct+"%";
+    $("meterPct").textContent = pct+"%";
+  }
+  $("noBtn").addEventListener("click", function(){
+    if(forgiven) return;
+    noClicks++;
+    pct = Math.min(92, pct + 14);
+    setMeter();
+    var btn = $("noBtn");
+    btn.textContent = noTexts[Math.min(noClicks, noTexts.length-1)];
+    var scale = Math.max(0.55, 1 - noClicks*0.09);
+    btn.style.transform = "scale("+scale+")";
+    $("yesBtn").style.transform = "scale("+(1 + noClicks*0.07)+")";
+    $("forgiveMsg").textContent = noClicks>=3 ? "شايف؟ حتى الزرار نفسه بيقولك سامح 🤍" : "كل «لسه» بتزوّد المسامحة غصب عنها 😄";
+    dropSorry(3);
+  });
+  $("yesBtn").addEventListener("click", function(){
+    if(forgiven) return;
+    forgiven = true; pct = 100; setMeter();
+    $("forgiveMsg").innerHTML = "أيوااا كده! 🎉🤍 اتسامحنا رسميًا — وعد مني مش هتتكرر. شكرًا إنك سامحتني!";
+    $("noBtn").style.display="none";
+    $("yesBtn").textContent = "اتسامحنا ✅🤍";
+    var box = $("heartsBox");
+    for(var h=0;h<24;h++){
+      (function(d){
+        setTimeout(function(){
+          var el=document.createElement("span");
+          el.className="heart"; el.textContent = ["🤍","❤️","🎉","✨"][Math.floor(Math.random()*4)];
+          el.style.left=(Math.random()*94)+"%"; el.style.bottom="0";
+          box.appendChild(el); setTimeout(function(){ el.remove(); }, 2300);
+        }, d);
+      })(h*90);
+    }
+    dropSorry(20);
+  });
+  setMeter(); syncWall();
+})();
+</script>
+</body>
+</html>
